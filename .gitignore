@@ -5,6 +5,8 @@ out
 .env.local
 .DS_Store
 *.log
+tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Generated pipeline artifacts; rebuild via npm run pipeline:all
 data/cache/
