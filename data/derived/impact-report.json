@@ -1,0 +1,227 @@
+{
+  "window": {
+    "startISO": "2026-02-28",
+    "endISO": "2026-05-28",
+    "prCount": 7621,
+    "engineerCount": 183
+  },
+  "topEngineers": [
+    {
+      "login": "rafaeelaudibert",
+      "name": "Rafael Audibert",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/32079912?v=4",
+      "archetype": "Glue",
+      "totalScore": 73.92,
+      "output": 62.33,
+      "leverage": 67.83,
+      "durability": 1.14,
+      "narrative": "Shipped cross-cutting features (BAA/DPA generator, MCP hints) spanning backend-to-frontend infrastructure while establishing Mosaic component library. Enabled 44 authors through review and mentorship across 1004 files touched.",
+      "topPRs": [
+        {
+          "number": 55541,
+          "title": "feat(legal-documents): in-app BAA/DPA generator",
+          "url": "https://github.com/PostHog/posthog/pull/55541",
+          "expertHours": 24
+        },
+        {
+          "number": 59126,
+          "title": "feat(mcp): add in-app MCP hint toasts and empty-state cards with opt-out setting",
+          "url": "https://github.com/PostHog/posthog/pull/59126",
+          "expertHours": 10
+        },
+        {
+          "number": 49425,
+          "title": "feat: Introduce Mosaic",
+          "url": "https://github.com/PostHog/posthog/pull/49425",
+          "expertHours": 10
+        }
+      ],
+      "stats": {
+        "prsAuthored": 112,
+        "prsReviewed": 255,
+        "uniqueAuthorsReviewed": 44,
+        "filesTouched": 1004,
+        "linesSurviving": 0
+      }
+    },
+    {
+      "login": "pauldambra",
+      "name": "Paul D'Ambra",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/984817?v=4",
+      "archetype": "Solver",
+      "totalScore": 65.24,
+      "output": 60.25,
+      "leverage": 72.54,
+      "durability": 0.98,
+      "narrative": "Shipped three substantial features spanning LLM integration, data visualization, and UI persistence, establishing patterns for feature-flagged, cross-system changes while systematically mentoring 45 authors through code review.",
+      "topPRs": [
+        {
+          "number": 54784,
+          "title": "feat(subscriptions): add LLM-powered change summaries to subscription deliveries",
+          "url": "https://github.com/PostHog/posthog/pull/54784",
+          "expertHours": 16
+        },
+        {
+          "number": 48043,
+          "title": "feat: add box plot chart visualization for trends insights",
+          "url": "https://github.com/PostHog/posthog/pull/48043",
+          "expertHours": 16
+        },
+        {
+          "number": 53340,
+          "title": "feat: pinning in TaxonomicFilter",
+          "url": "https://github.com/PostHog/posthog/pull/53340",
+          "expertHours": 10
+        }
+      ],
+      "stats": {
+        "prsAuthored": 385,
+        "prsReviewed": 208,
+        "uniqueAuthorsReviewed": 45,
+        "filesTouched": 1132,
+        "linesSurviving": 0
+      }
+    },
+    {
+      "login": "webjunkie",
+      "name": "Julian Bez",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/59713?v=4",
+      "archetype": "Tech Lead",
+      "totalScore": 62.51,
+      "output": 69.07,
+      "leverage": 100,
+      "durability": 0.74,
+      "narrative": "Orchestrated three major architectural reorganizations (700+ files) that decoupled core subsystems while preserving stability, establishing repeatable patterns for large-scale refactoring across the product.",
+      "topPRs": [
+        {
+          "number": 60001,
+          "title": "chore(product-analytics): move insight models to product app",
+          "url": "https://github.com/PostHog/posthog/pull/60001",
+          "expertHours": 16
+        },
+        {
+          "number": 59191,
+          "title": "chore(devex): split data_warehouse into warehouse_sources, data_modeling, data_tools",
+          "url": "https://github.com/PostHog/posthog/pull/59191",
+          "expertHours": 16
+        },
+        {
+          "number": 51923,
+          "title": "chore(feature_flags): move feature flag models to products app",
+          "url": "https://github.com/PostHog/posthog/pull/51923",
+          "expertHours": 16
+        }
+      ],
+      "stats": {
+        "prsAuthored": 223,
+        "prsReviewed": 221,
+        "uniqueAuthorsReviewed": 55,
+        "filesTouched": 1420,
+        "linesSurviving": 0
+      }
+    },
+    {
+      "login": "Gilbert09",
+      "name": "Tom Owers",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/1459269?v=4",
+      "archetype": "Solver",
+      "totalScore": 58.15,
+      "output": 57.95,
+      "leverage": 44.64,
+      "durability": 1.13,
+      "narrative": "Systematically eliminated DLT dependencies across data pipelines and built observability infrastructure for HTTP transports, enabling safer refactoring of critical ingestion systems while reducing technical debt at scale.",
+      "topPRs": [
+        {
+          "number": 54307,
+          "title": "chore(data-warehouse): Remove the usage of DLT from the rest_source",
+          "url": "https://github.com/PostHog/posthog/pull/54307",
+          "expertHours": 24
+        },
+        {
+          "number": 56652,
+          "title": "feat(data-warehouse): add tracked HTTP transport for warehouse sources",
+          "url": "https://github.com/PostHog/posthog/pull/56652",
+          "expertHours": 16
+        },
+        {
+          "number": 50964,
+          "title": "feat(data-warehouse): Added hog function creation for webhook sources in the wizard",
+          "url": "https://github.com/PostHog/posthog/pull/50964",
+          "expertHours": 10
+        }
+      ],
+      "stats": {
+        "prsAuthored": 125,
+        "prsReviewed": 176,
+        "uniqueAuthorsReviewed": 47,
+        "filesTouched": 528,
+        "linesSurviving": 0
+      }
+    },
+    {
+      "login": "lricoy",
+      "name": "Lucas Ricoy",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/2034367?v=4",
+      "archetype": "Shipper",
+      "totalScore": 55.76,
+      "output": 83.75,
+      "leverage": 13.74,
+      "durability": 1.14,
+      "narrative": "Shipped lazy precomputation framework for web analytics, reducing query latency across high-volume analytics paths. Established patterns for ClickHouse schema migrations and HogQL integration that enable future performance work.",
+      "topPRs": [
+        {
+          "number": 59713,
+          "title": "feat(web-analytics): lazy precomputation for web stats simple breakdowns",
+          "url": "https://github.com/PostHog/posthog/pull/59713",
+          "expertHours": 24
+        },
+        {
+          "number": 59791,
+          "title": "feat(web-analytics): lazy precomputation for web vitals paths tile",
+          "url": "https://github.com/PostHog/posthog/pull/59791",
+          "expertHours": 16
+        },
+        {
+          "number": 59075,
+          "title": "feat(web-analytics): lazy precomputation for web_overview_query",
+          "url": "https://github.com/PostHog/posthog/pull/59075",
+          "expertHours": 16
+        }
+      ],
+      "stats": {
+        "prsAuthored": 113,
+        "prsReviewed": 148,
+        "uniqueAuthorsReviewed": 40,
+        "filesTouched": 313,
+        "linesSurviving": 0
+      }
+    }
+  ],
+  "methodology": {
+    "summary": "Each engineer scored on three axes. Output and Leverage are normalised to 0–100 across the candidate pool; Durability is a multiplier in [0.5, 1.5]. Total = (Output·0.5 + Leverage·0.5) · Durability. Candidate pool is the top 30 contributors by activity over the window; the top 5 are shown.",
+    "axes": [
+      {
+        "name": "Output",
+        "description": "Quality-adjusted expert-hour estimate from an LLM (Claude Haiku 4.5) reading each PR's title, body, diff summary, files, labels and linked issues. Per-PR capped, category-weighted, reverts down-weighted to 25%.",
+        "weight": 0.5
+      },
+      {
+        "name": "Leverage",
+        "description": "Review-graph PageRank (reviewer→author edges weighted by review depth) multiplied by file criticality — files central to the codebase, measured by how often they're touched in the window, count more than peripheral ones.",
+        "weight": 0.5
+      },
+      {
+        "name": "Durability",
+        "description": "Anti-churn multiplier. Fraction of an engineer's authored lines from the first 60 days of the window that aren't subsequently re-touched by other engineers. Code that stands is worth more than code that needs immediate rework.",
+        "weight": 1
+      }
+    ],
+    "caveats": [
+      "Only the top 30 candidates by activity are LLM-scored; a high-impact engineer with very few PRs would not appear.",
+      "Bots (renovate, dependabot, *-bot) are filtered out.",
+      "Durability inside a 90-day window is an approximation; longer windows would be more reliable.",
+      "Reverts are detected by title heuristic ('Revert \"...\"') and body references; non-standard revert PRs may be missed.",
+      "File criticality is a proxy (in-window touch count), not a true import-graph centrality."
+    ]
+  }
+}

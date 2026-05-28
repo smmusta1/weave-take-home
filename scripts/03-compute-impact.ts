@@ -172,42 +172,44 @@ function computeLeverageRaw(
   };
 }
 
-function computeDurability(prs: PullRequest[], login: string): number {
-  const sorted = [...prs].sort(
-    (a, b) => new Date(a.mergedAt ?? a.createdAt).getTime() - new Date(b.mergedAt ?? b.createdAt).getTime(),
-  );
-  if (sorted.length === 0) return 1.0;
-  const first = new Date(sorted[0].mergedAt ?? sorted[0].createdAt).getTime();
-  const last = new Date(sorted[sorted.length - 1].mergedAt ?? sorted[sorted.length - 1].createdAt).getTime();
-  const span = Math.max(last - first, 1);
+function computeDurability(
+  prs: PullRequest[],
+  login: string,
+  windowStart: number,
+  windowEnd: number,
+): number {
   const dayMs = 24 * 60 * 60 * 1000;
-  const windowDays = span / dayMs;
-  const cutoff = first + Math.max(span * (60 / Math.max(windowDays, 90)), 0) ;
-  const earlyPRs = sorted.filter((p) => new Date(p.mergedAt ?? p.createdAt).getTime() <= first + dayMs * 60);
-  if (earlyPRs.length === 0) return 1.0;
+  const totalDays = Math.max((windowEnd - windowStart) / dayMs, 1);
+  const earlyFraction = 2 / 3;
+  const cutoff = windowStart + (windowEnd - windowStart) * earlyFraction;
 
-  const earlyAuthored = new Map<string, number>();
-  for (const pr of earlyPRs) {
-    if (pr.authorLogin !== login) continue;
+  const mine = prs.filter((p) => p.authorLogin === login);
+  if (mine.length === 0) return 1.0;
+
+  const earlyAuthoredFiles = new Map<string, number>();
+  for (const pr of mine) {
+    const t = new Date(pr.mergedAt ?? pr.createdAt).getTime();
+    if (t > cutoff) continue;
     for (const f of pr.files) {
-      earlyAuthored.set(f.path, (earlyAuthored.get(f.path) ?? 0) + f.additions);
+      earlyAuthoredFiles.set(f.path, (earlyAuthoredFiles.get(f.path) ?? 0) + f.additions);
     }
   }
-  if (earlyAuthored.size === 0) return 1.0;
+  if (earlyAuthoredFiles.size === 0) return 1.0;
 
   let totalLines = 0;
-  let touchedAgain = 0;
-  for (const [filePath, lines] of earlyAuthored) {
+  let touchedAgainLines = 0;
+  for (const [filePath, lines] of earlyAuthoredFiles) {
     totalLines += lines;
-    const reTouched = sorted.some(
+    const reTouched = prs.some(
       (pr) =>
         pr.authorLogin !== login &&
         new Date(pr.mergedAt ?? pr.createdAt).getTime() > cutoff &&
         pr.files.some((f) => f.path === filePath),
     );
-    if (reTouched) touchedAgain += lines;
+    if (reTouched) touchedAgainLines += lines;
   }
-  const survivingFraction = totalLines === 0 ? 1 : 1 - touchedAgain / totalLines;
+  const survivingFraction = totalLines === 0 ? 1 : 1 - touchedAgainLines / totalLines;
+  void totalDays;
   return Math.max(0.5, Math.min(1.5, 0.5 + survivingFraction));
 }
 
@@ -219,17 +221,23 @@ function inferArchetype(stats: {
   uniqueAuthorsReviewed: number;
   topLevelDirsTouched: number;
 }): ArchetypeLabel {
-  const { outputNorm, leverageNorm, prsAuthored, prsReviewed, uniqueAuthorsReviewed, topLevelDirsTouched } =
-    stats;
-  const reviewHeavy = prsReviewed > prsAuthored * 1.5;
-  const broadMentorship = uniqueAuthorsReviewed >= 10;
-  const concentrated = topLevelDirsTouched <= 2 && outputNorm > 30;
-  const broad = topLevelDirsTouched >= 5;
+  const {
+    outputNorm,
+    leverageNorm,
+    prsAuthored,
+    prsReviewed,
+    uniqueAuthorsReviewed,
+    topLevelDirsTouched,
+  } = stats;
+  const reviewRatio = prsReviewed / Math.max(prsAuthored, 1);
+  const outputDominant = outputNorm > leverageNorm * 1.5;
+  const leverageDominant = leverageNorm > outputNorm * 1.3;
 
-  if (reviewHeavy && broadMentorship && outputNorm < leverageNorm * 0.6) return "Glue";
-  if (concentrated && outputNorm > 0) return "Architect";
-  if (broad && prsAuthored >= 10) return "Solver";
-  if (outputNorm >= leverageNorm) return "Shipper";
+  if (reviewRatio >= 1.7 && uniqueAuthorsReviewed >= 30) return "Glue";
+  if (outputDominant && prsAuthored >= 50) return "Shipper";
+  if (topLevelDirsTouched <= 3 && outputNorm > 40) return "Architect";
+  if (leverageDominant && uniqueAuthorsReviewed >= 20) return "Tech Lead";
+  if (topLevelDirsTouched >= 6 && prsAuthored >= 30) return "Solver";
   return "Tech Lead";
 }
 
@@ -310,6 +318,12 @@ async function main() {
   const pr = pagerank(g, { getEdgeWeight: "weight" });
   const pageRanks = new Map(Object.entries(pr));
 
+  const ts = prs
+    .map((p) => new Date(p.mergedAt ?? p.createdAt).getTime())
+    .sort((a, b) => a - b);
+  const windowStart = ts[0] ?? 0;
+  const windowEnd = ts[ts.length - 1] ?? Date.now();
+
   // Stage 1: raw scores
   type Raw = {
     login: string;
@@ -327,7 +341,7 @@ async function main() {
   for (const login of candidates) {
     const o = computeOutput(prs, scoresByPr, login);
     const lv = computeLeverageRaw(prs, touches, pageRanks, login);
-    const dur = computeDurability(prs, login);
+    const dur = computeDurability(prs, login, windowStart, windowEnd);
 
     const prsAuthored = prs.filter((p) => p.authorLogin === login).length;
     const reviewedPRs = prs.filter((p) =>
@@ -373,19 +387,18 @@ async function main() {
   // Stage 3: per top-5 narrative + archetype + user meta
   const topEngineers: EngineerImpact[] = [];
   for (const r of top) {
+    const dirs = new Set(
+      prs.filter((p) => p.authorLogin === r.login).flatMap((p) => p.files.map((f) => topLevelDir(f.path))),
+    ).size;
     const archetype = inferArchetype({
       outputNorm: r.outputNorm,
       leverageNorm: r.leverageNorm,
       prsAuthored: r.stats.prsAuthored,
       prsReviewed: r.stats.prsReviewed,
       uniqueAuthorsReviewed: r.stats.uniqueAuthorsReviewed,
-      topLevelDirsTouched:
-        new Set(
-          prs
-            .filter((p) => p.authorLogin === r.login)
-            .flatMap((p) => p.files.map((f) => topLevelDir(f.path))),
-        ).size,
+      topLevelDirsTouched: dirs,
     });
+    console.log(`  @${r.login}: dirs=${dirs}, reviewRatio=${(r.stats.prsReviewed/Math.max(r.stats.prsAuthored,1)).toFixed(2)} -> ${archetype}`);
 
     const evidence = r.topPRs.slice(0, 3).map((c) => {
       const s = scoresByPr.get(c.pr.number);

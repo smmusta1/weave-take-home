@@ -36,6 +36,21 @@ npm run dev            # http://localhost:3000
 The dashboard reads `data/derived/impact-report.json` — pre-computed at build time so the page
 loads from a static JSON and the <10s load requirement is trivially satisfied.
 
+## Deploy
+
+The dashboard is a fully static Next.js page that reads the committed
+`data/derived/impact-report.json` at build time. Deployment is therefore stateless — no env vars
+needed on the host.
+
+**Vercel (recommended):**
+
+1. Run `npm run pipeline:all` locally to generate the JSON.
+2. `git add data/derived/impact-report.json && git commit && git push`.
+3. Import the repo at https://vercel.com/new — Vercel auto-detects Next.js. No env vars required.
+4. Future re-runs of the pipeline + push will auto-redeploy with a fresh snapshot.
+
+If you'd rather use the Vercel CLI: `npx vercel --prod` from the repo root.
+
 ## Project layout
 
 ```
