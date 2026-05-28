@@ -14,10 +14,12 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.40.0",
+    "@octokit/graphql": "^9.0.3",
     "@octokit/rest": "^21.0.2",
+    "dotenv": "^17.0.0",
     "graphology": "^0.26.0",
-    "graphology-pagerank": "^1.1.4",
-    "next": "15.1.0",
+    "graphology-metrics": "^2.4.0",
+    "next": "15.5.18",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "recharts": "^2.15.0"
