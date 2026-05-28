@@ -98,6 +98,26 @@ function isoDaysAgo(days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+function isoDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+function buildWindowChunks(windowDays: number, chunkDays: number): { from: string; to: string }[] {
+  const now = new Date();
+  const chunks: { from: string; to: string }[] = [];
+  for (let offset = 0; offset < windowDays; offset += chunkDays) {
+    const to = new Date(now);
+    to.setUTCDate(to.getUTCDate() - offset);
+    const from = new Date(to);
+    from.setUTCDate(from.getUTCDate() - chunkDays + 1);
+    const windowStart = new Date(now);
+    windowStart.setUTCDate(windowStart.getUTCDate() - windowDays + 1);
+    const clampedFrom = from < windowStart ? windowStart : from;
+    chunks.push({ from: isoDate(clampedFrom), to: isoDate(to) });
+  }
+  return chunks;
+}
+
 function detectRevert(title: string, body: string | null): boolean {
   if (/^Revert\s+["']/i.test(title)) return true;
   if (body && /\breverts?\s+#\d+/i.test(body)) return true;
@@ -140,11 +160,10 @@ async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function fetchAllPRs(): Promise<PullRequest[]> {
-  const since = isoDaysAgo(WINDOW_DAYS);
-  const q = `repo:${OWNER}/${REPO} is:pr is:merged merged:>=${since}`;
+async function fetchChunk(from: string, to: string): Promise<PullRequest[]> {
+  const q = `repo:${OWNER}/${REPO} is:pr is:merged merged:${from}..${to}`;
   let cursor: string | null = null;
-  const all: PullRequest[] = [];
+  const out: PullRequest[] = [];
   let page = 0;
 
   while (true) {
@@ -159,7 +178,7 @@ async function fetchAllPRs(): Promise<PullRequest[]> {
         attempt += 1;
         if (attempt > 4) throw err;
         const backoff = 1000 * 2 ** attempt;
-        console.error(`page ${page} error (attempt ${attempt}): ${err.message}; backing off ${backoff}ms`);
+        console.error(`chunk ${from}..${to} page ${page} error (attempt ${attempt}): ${err.message}; backing off ${backoff}ms`);
         await sleep(backoff);
       }
     }
@@ -167,13 +186,18 @@ async function fetchAllPRs(): Promise<PullRequest[]> {
     const nodes: GqlPR[] = result.search.nodes ?? [];
     for (const n of nodes) {
       const c = toCanonical(n);
-      if (c) all.push(c);
+      if (c) out.push(c);
     }
 
     const rl = result.rateLimit;
+    const total = result.search.issueCount;
     console.log(
-      `page ${page}: +${nodes.length} (total=${all.length}, total available=${result.search.issueCount}); rate remaining=${rl.remaining}`,
+      `  ${from}..${to} page ${page}: +${nodes.length} (chunk total=${out.length}/${total}); rate remaining=${rl.remaining}`,
     );
+
+    if (total >= 1000) {
+      console.warn(`  WARNING: chunk ${from}..${to} hit ${total} results, search cap is 1000 — shrink chunkDays`);
+    }
 
     if (!result.search.pageInfo.hasNextPage) break;
     cursor = result.search.pageInfo.endCursor;
@@ -184,7 +208,27 @@ async function fetchAllPRs(): Promise<PullRequest[]> {
       await sleep(Math.max(resetMs + 1000, 1000));
     }
   }
+  return out;
+}
 
+async function fetchAllPRs(): Promise<PullRequest[]> {
+  const chunks = buildWindowChunks(WINDOW_DAYS, 7);
+  const seen = new Set<number>();
+  const all: PullRequest[] = [];
+  for (let i = 0; i < chunks.length; i += 1) {
+    const c = chunks[i];
+    console.log(`chunk ${i + 1}/${chunks.length}: ${c.from} .. ${c.to}`);
+    const chunkPRs = await fetchChunk(c.from, c.to);
+    let added = 0;
+    for (const pr of chunkPRs) {
+      if (seen.has(pr.number)) continue;
+      seen.add(pr.number);
+      all.push(pr);
+      added += 1;
+    }
+    console.log(`  chunk done: +${added} new (running total=${all.length})`);
+  }
+  void isoDaysAgo;
   return all;
 }
 
