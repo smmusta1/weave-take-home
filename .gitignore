@@ -8,6 +8,8 @@ out
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
-# Generated pipeline artifacts; rebuild via npm run pipeline:all
+# Raw fetched + LLM-scored data (large, rebuild via npm run pipeline:all)
 data/cache/
-data/derived/
+
+# Note: data/derived/impact-report.json IS committed so the deployed
+# dashboard has a baked snapshot to render.

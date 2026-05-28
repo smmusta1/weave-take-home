@@ -21,7 +21,9 @@ if (!TOKEN) {
 const OWNER = process.env.TARGET_OWNER ?? "PostHog";
 const REPO = process.env.TARGET_REPO ?? "posthog";
 const WINDOW_DAYS = Number(process.env.WINDOW_DAYS ?? 90);
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 50;
+const MAX_FILES_PER_PR = 50;
+const MAX_REVIEWS_PER_PR = 30;
 
 const CACHE_DIR = path.join(process.cwd(), "data/cache");
 const PR_FILE = path.join(CACHE_DIR, "prs.json");
@@ -73,8 +75,8 @@ query($q: String!, $cursor: String) {
         changedFiles
         author { login }
         labels(first: 20) { nodes { name } }
-        files(first: 100) { nodes { path additions deletions } }
-        reviews(first: 50) {
+        files(first: ${MAX_FILES_PER_PR}) { nodes { path additions deletions } }
+        reviews(first: ${MAX_REVIEWS_PER_PR}) {
           nodes {
             author { login }
             state
