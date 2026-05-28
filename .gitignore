@@ -7,6 +7,8 @@ out
 *.log
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+.claude/
+.vercel
 
 # Raw fetched + LLM-scored data (large, rebuild via npm run pipeline:all)
 data/cache/
