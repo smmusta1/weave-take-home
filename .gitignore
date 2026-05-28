@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.env
+.env.local
+.DS_Store
+*.log
+
+# Generated pipeline artifacts; rebuild via npm run pipeline:all
+data/cache/
+data/derived/

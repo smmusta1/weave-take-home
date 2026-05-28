@@ -1,0 +1,36 @@
+{
+  "name": "weave-take-home",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "pipeline:fetch": "tsx scripts/01-fetch-github.ts",
+    "pipeline:score": "tsx scripts/02-score-prs.ts",
+    "pipeline:rank": "tsx scripts/03-compute-impact.ts",
+    "pipeline:all": "npm run pipeline:fetch && npm run pipeline:score && npm run pipeline:rank"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "@octokit/rest": "^21.0.2",
+    "graphology": "^0.26.0",
+    "graphology-pagerank": "^1.1.4",
+    "next": "15.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "recharts": "^2.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "autoprefixer": "^10.4.20",
+    "p-limit": "^6.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
